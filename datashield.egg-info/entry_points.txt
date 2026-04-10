@@ -1,0 +1,5 @@
+[console_scripts]
+datashield = datashield.cli:main
+datashield-migrate = datashield.migrate:main
+datashield-web = datashield.api.app:main
+datashield-worker = datashield.worker:main

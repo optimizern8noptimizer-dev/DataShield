@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: datashield
+      POSTGRES_USER: datashield
+      POSTGRES_PASSWORD: datashield
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datashield -d datashield"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+
+  migrate:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DS_CONTROL_DB_URL: postgresql+psycopg://datashield:datashield@postgres:5432/datashield
+      DS_BOOTSTRAP_ADMIN: ${DS_BOOTSTRAP_ADMIN:-admin}
+      DS_BOOTSTRAP_PASSWORD: ${DS_BOOTSTRAP_PASSWORD:-admin12345}
+      DS_BOOTSTRAP_ROLE: admin
+    command: datashield-migrate
+
+  app:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    environment:
+      DS_CONTROL_DB_URL: postgresql+psycopg://datashield:datashield@postgres:5432/datashield
+      DS_BOOTSTRAP_ADMIN: ${DS_BOOTSTRAP_ADMIN:-admin}
+      DS_BOOTSTRAP_PASSWORD: ${DS_BOOTSTRAP_PASSWORD:-admin12345}
+      DS_BOOTSTRAP_ROLE: admin
+      DATASHIELD_AUDIT_KEY: ${DATASHIELD_AUDIT_KEY:-change-me-in-production}
+      DS_OIDC_ISSUER_URL: ${DS_OIDC_ISSUER_URL:-}
+      DS_OIDC_CLIENT_ID: ${DS_OIDC_CLIENT_ID:-}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: uvicorn datashield.api.app:app --host 0.0.0.0 --port 8080
+
+  worker:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    environment:
+      DS_CONTROL_DB_URL: postgresql+psycopg://datashield:datashield@postgres:5432/datashield
+      DATASHIELD_AUDIT_KEY: ${DATASHIELD_AUDIT_KEY:-change-me-in-production}
+      DS_WORKER_POLL_INTERVAL: ${DS_WORKER_POLL_INTERVAL:-2}
+      DS_WORKER_NAME: ${DS_WORKER_NAME:-worker-1}
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: datashield-worker
+
+volumes:
+  pgdata:
+  redisdata:

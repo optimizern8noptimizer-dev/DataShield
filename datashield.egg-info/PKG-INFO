@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: datashield
+Version: 2.2.2
+Summary: DataShield BY - enterprise web-managed data anonymization for banking datasets, Python 3.15 alpha compatible hotfix profile
+Requires-Python: >=3.10
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: click>=8.1
+Requires-Dist: pymysql>=1.1
+Requires-Dist: redis>=5.0
+Requires-Dist: flask>=3.0
+Requires-Dist: waitress>=3.0
+Provides-Extra: postgres
+Requires-Dist: psycopg[binary]>=3.1; extra == "postgres"
+Provides-Extra: oracle
+Requires-Dist: oracledb>=2.0; extra == "oracle"

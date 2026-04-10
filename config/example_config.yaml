@@ -1,0 +1,74 @@
+version: "2.0"
+
+session:
+  name: "bank_prod_anonymize_by_demo"
+  mode: dry_run           # copy | in_place | dry_run
+  parallelism: 2
+  batch_size: 500
+  snapshot_before: true
+  degraded_mode: char_mask
+
+source:
+  type: sqlite
+  database: ./demo_bank.sqlite
+
+target:
+  type: sqlite
+  database: ./demo_bank_masked.sqlite
+
+cache:
+  backend: memory         # memory | redis
+  ttl: 2592000
+
+audit:
+  log_path: ./logs/datashield_audit.jsonl
+  strict_key: false
+
+tables:
+  - name: clients
+    pk_column: client_id
+    columns:
+      - name: full_name
+        service: fio
+      - name: birth_date
+        service: birthdate
+      - name: phone
+        service: phone
+      - name: email
+        service: email
+      - name: address
+        service: cdiAddress
+      - name: income
+        service: number
+        params:
+          blur_type: percent
+          blur_value: 20
+          preserve_sign: true
+          preserve_zero: true
+
+  - name: cards
+    pk_column: card_id
+    fk_columns:
+      - name: client_id
+        references: clients.client_id
+    columns:
+      - name: card_number
+        service: bankCard
+      - name: account_number
+        service: bankAccount
+
+  - name: legal_entities
+    pk_column: entity_id
+    columns:
+      - name: company_name
+        service: legalDetails
+
+  - name: client_contacts
+    pk_column: contact_id
+    where_clause: "is_active = true"
+    fk_columns:
+      - name: client_id
+        references: clients.client_id
+    columns:
+      - name: contact_value
+        service: phone

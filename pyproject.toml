@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datashield"
+version = "2.5.0"
+description = "DataShield BY - commercial web-managed data anonymization for banking datasets with upload-mask-download workflow"
+requires-python = ">=3.10"
+dependencies = [
+    "SQLAlchemy==2.1.0b1",
+    "pyyaml>=6.0",
+    "click>=8.1",
+    "pymysql>=1.1",
+    "redis>=5.0",
+    "flask>=3.0",
+    "waitress>=3.0",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]
+oracle = ["oracledb>=2.0"]
+
+[project.scripts]
+datashield = "datashield.cli:main"
+datashield-migrate = "datashield.migrate:main"
+datashield-worker = "datashield.worker:main"
+datashield-web = "datashield.api.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["datashield*"]

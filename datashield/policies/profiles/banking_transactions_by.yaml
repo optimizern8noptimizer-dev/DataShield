@@ -1,0 +1,12 @@
+policy_name: banking_transactions_by
+policy_version: 1.0.0
+country: BY
+mode: explicit_profile_first
+profiles:
+  transactions:
+    merchant_name: text
+    merchant_city: city
+    description: text
+    counterparty_iban: bankAccount
+    ip_address: ipAddress
+    device_id: deviceId

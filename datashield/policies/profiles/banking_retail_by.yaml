@@ -1,0 +1,39 @@
+policy_name: banking_retail_by
+policy_version: 1.0.0
+country: BY
+mode: explicit_profile_first
+strict_policy:
+  fail_on_unmapped_high_risk: true
+  fail_on_pk_change: true
+  fail_on_fk_break: true
+  fail_on_invalid_pan: true
+  fail_on_invalid_iban: true
+profiles:
+  clients:
+    first_name: fio
+    last_name: fio
+    middle_name: fio
+    birth_date: birthdate
+    passport_no: passport
+    national_id: identifier
+    phone: phone
+    email: email
+    address: cdiAddress
+    region: region
+  accounts:
+    iban: bankAccount
+    balance: number
+  cards:
+    pan:
+      service: bankCard
+      linked_columns: [expiry, holder_name]
+    expiry: cardExpiry
+    holder_name: cardHolder
+    iban: bankAccount
+  legal_entities:
+    company_name: legalDetails
+    registration_no: legalDetails
+    tax_id: taxId
+    contact_phone: phone
+    contact_email: email
+    legal_address: cdiAddress

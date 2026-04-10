@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DataShield BY 2.6 Enterprise Console</title>
+  <style>
+    :root{
+      --bg:#07101f;
+      --bg2:#0b1630;
+      --panel:#0d1932;
+      --panel2:#102041;
+      --line:#21365d;
+      --line2:#2b4f8f;
+      --text:#eff5ff;
+      --muted:#9eb2d8;
+      --accent:#4f8cff;
+      --accent2:#2bd0b3;
+      --danger:#ff6e86;
+      --warn:#ffb95c;
+      --ok:#2bd0b3;
+      --shadow:0 24px 64px rgba(0,0,0,.35);
+      --radius:22px;
+      --radius-sm:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(circle at 0% 0%,rgba(79,140,255,.18),transparent 30%),
+      radial-gradient(circle at 100% 0%,rgba(43,208,179,.10),transparent 24%),
+      linear-gradient(180deg,#07101f,#091329 55%,#08101d 100%);
+      color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+    a{color:#b9d3ff;text-decoration:none}
+    .shell{max-width:1640px;margin:0 auto;padding:24px}
+    .hero{display:grid;grid-template-columns:1.35fr .65fr;gap:22px;margin-bottom:22px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .inner{padding:24px}
+    .hero h1{margin:0;font-size:46px;letter-spacing:-.04em}
+    .hero p{margin:12px 0 0;color:var(--muted);line-height:1.65;max-width:980px}
+    .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .badge{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:12px;color:#d9e8ff}
+    .sessionBox{display:flex;flex-direction:column;gap:14px;height:100%;justify-content:space-between}
+    .sessionState{padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#081223;font-weight:700}
+    .status-ok{border-color:rgba(43,208,179,.35)!important;background:rgba(43,208,179,.10)!important}
+    .status-warn{border-color:rgba(255,185,92,.35)!important;background:rgba(255,185,92,.08)!important}
+    .status-bad{border-color:rgba(255,110,134,.35)!important;background:rgba(255,110,134,.09)!important}
+    .layout{display:grid;grid-template-columns:380px 1fr;gap:22px}
+    .sidebar{display:grid;gap:22px;align-self:start}
+    .main{display:grid;gap:22px}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+    .stat{padding:18px;border-radius:18px;background:#081223;border:1px solid var(--line)}
+    .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .stat .v{margin-top:12px;font-size:38px;font-weight:800}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .gridMain{display:grid;grid-template-columns:1.08fr .92fr;gap:22px}
+    .sectionHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+    .sectionHead h2{margin:0;font-size:30px;letter-spacing:-.03em}
+    .sectionHead h3{margin:0;font-size:24px;letter-spacing:-.02em}
+    .sectionHead p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+    .stack{display:flex;flex-direction:column;gap:12px}
+    label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:14px 15px;border-radius:16px;border:1px solid #29416f;background:#081223;color:var(--text);outline:none;font-size:15px;transition:.18s ease}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.16)}
+    textarea{min-height:180px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    button{border:0;border-radius:16px;padding:14px 16px;font-weight:800;cursor:pointer;transition:.18s ease}
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,#4f8cff,#6a5cff);color:#fff}
+    .btn-secondary{background:#13234a;border:1px solid #2b4474;color:#e8f1ff}
+    .btn-success{background:linear-gradient(135deg,#2bd0b3,#2fc18b);color:#04261f}
+    .btn-danger{background:linear-gradient(135deg,rgba(255,110,134,.16),rgba(255,110,134,.10));border:1px solid rgba(255,110,134,.30);color:#ffd9e0}
+    .btn-ghost{background:transparent;border:1px solid #2b4474;color:#dce9ff}
+    .buttonRow{display:flex;gap:10px;flex-wrap:wrap}
+    .buttonRow>*{flex:1}
+    .drop{border:1.5px dashed #3159a2;border-radius:18px;padding:18px;background:rgba(79,140,255,.08)}
+    .mini{font-size:12px;color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    .resultBox{padding:16px;border-radius:18px;border:1px solid var(--line);background:#07101f;white-space:pre-wrap;word-break:break-word;color:#dce8ff;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;min-height:74px}
+    .summaryBox{padding:16px;border-radius:18px;border:1px solid rgba(43,208,179,.30);background:rgba(43,208,179,.08)}
+    .summaryGrid{display:grid;grid-template-columns:220px 1fr;gap:10px 14px}
+    .summaryGrid b{color:#dcfff8}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #32549a;background:#081223;font-size:12px;color:#dce8ff}
+    .analysisWrap,.listWrap{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:18px;background:#07101f}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{position:sticky;top:0;background:#0d162b;color:#9eb2d8;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .dbPreviewToolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.dbPreviewToolbar>*{flex:1}.tableFrame{border:1px solid var(--line);border-radius:18px;overflow:auto;background:#07101f;max-height:420px}.tableFrame table{min-width:100%}.tableFrame .empty{padding:18px;color:var(--muted)}.tableMeta{display:flex;gap:12px;flex-wrap:wrap}.tableMeta .pill{background:#0b1730}.hidden{display:none!important}
+    .resultLinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .authBusy{opacity:.72;pointer-events:none}
+    .coverBand{display:flex;gap:12px;flex-wrap:wrap}
+    .coverCard{flex:1;min-width:220px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#081223}
+    .coverCard .k{font-size:12px;color:var(--muted);text-transform:uppercase}
+    .coverCard .v{margin-top:8px;font-size:24px;font-weight:800}
+    .actionBar{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .actionBar > *{flex:1}
+    .compareGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .subCard{border:1px solid var(--line);border-radius:18px;background:#081223;padding:14px}
+    .subCard h4{margin:0 0 10px 0;font-size:18px}
+    .toolbarCompact{display:grid;grid-template-columns:1fr 180px;gap:10px;align-items:end;margin-bottom:12px}
+    .labelRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+    .kpiBand{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpiMini{padding:12px;border-radius:14px;background:#07101f;border:1px solid var(--line)}
+    .kpiMini .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .kpiMini .v{margin-top:7px;font-size:20px;font-weight:800}
+
+    .rightSticky{position:sticky;top:24px}
+    @media (max-width:1350px){.hero,.layout,.grid2,.gridMain{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.rightSticky{position:static}}
+    @media (max-width:1100px){.compareGrid,.kpiBand{grid-template-columns:1fr}}
+    @media (max-width:720px){.shell{padding:14px}.hero h1{font-size:34px}.stats{grid-template-columns:1fr}.buttonRow{flex-direction:column}.summaryGrid{grid-template-columns:1fr}.toolbarCompact{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <div class="card"><div class="inner">
+      <h1>DataShield BY 2.6</h1>
+      <p>Профессиональная платформа обезличивания банковских датасетов. Поток работы: <b>вход → загрузка базы → анализ покрытия → маскирование → аудит результата → скачивание базы и отчётов</b>. Интерфейс рассчитан на демонстрацию заказчику, а не на внутренний техскрипт.</p>
+      <div class="badges">
+        <span class="badge">Belarus-first masking</span>
+        <span class="badge">Commercial UI</span>
+        <span class="badge">Upload → Analyze → Mask → Report</span>
+        <span class="badge">Audit hash-chain</span>
+        <span class="badge">Queue worker mode</span>
+      </div>
+    </div></div>
+    <div class="card"><div class="inner sessionBox">
+      <div>
+        <div class="sectionHead"><div><h3>Сессия</h3><p>Токен хранится локально в браузере. Все защищённые download операции идут с Bearer token.</p></div></div>
+        <div id="session_state" class="sessionState status-warn">Не авторизован</div>
+      </div>
+      <div class="buttonRow">
+        <button class="btn-secondary" onclick="whoAmI()">Проверить сессию</button>
+        <button class="btn-danger" onclick="logout()">Logout</button>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="layout">
+    <aside class="sidebar">
+      <div class="card"><div class="inner stack">
+        <div class="sectionHead"><div><h3>Авторизация</h3><p>Локальный bootstrap-вход для пилотного режима.</p></div></div>
+        <form id="login_form" class="stack" onsubmit="return false;">
+          <div><label for="login_user">Пользователь</label><input id="login_user" autocomplete="username" value=""></div>
+          <div><label for="login_pass">Пароль</label><input id="login_pass" type="password" autocomplete="current-password" value=""></div>
+          <div class="buttonRow">
+            <button id="login_btn" type="button" class="btn-primary" onclick="login()">Войти в консоль</button>
+            <button id="login_reset_btn" type="button" class="btn-secondary" onclick="resetLoginForm()">Сбросить</button>
+          </div>
+        </form>
+        <div id="auth_status" class="sessionState status-warn">Ожидается вход.</div>
+        <div id="auth_output" class="resultBox hidden">Технический вывод авторизации.</div>
+      </div></div>
+
+      <div class="card"><div class="inner stack">
+        <div class="sectionHead"><div><h3>Быстрый preview</h3><p>Проверка одного значения до запуска полного job.</p></div></div>
+        <div><label for="svc">Сервис маскирования</label><input id="svc" value="phone"></div>
+        <div><label for="val">Значение</label><input id="val" value="+375 (29) 123-45-67"></div>
+        <div><label for="preview_mode">Режим</label>
+          <select id="preview_mode">
+            <option value="deterministic">deterministic</option>
+            <option value="randomized">randomized</option>
+          </select>
+        </div>
+        <button class="btn-secondary" onclick="maskPreview()">Run preview</button>
+        <div id="preview_output" class="resultBox">Preview ещё не выполнялся.</div>
+      </div></div>
+    </aside>
+
+    <main class="main">
+      <div class="stats">
+        <div class="stat"><div class="k">Uploaded DB</div><div id="stat_uploaded" class="v">0</div></div>
+        <div class="stat"><div class="k">Queued</div><div id="stat_queued" class="v">0</div></div>
+        <div class="stat"><div class="k">Completed</div><div id="stat_completed" class="v">0</div></div>
+        <div class="stat"><div class="k">Failed</div><div id="stat_failed" class="v">0</div></div>
+        <div class="stat"><div class="k">Coverage</div><div id="stat_coverage" class="v">0</div></div>
+      </div>
+
+      <div class="gridMain">
+        <section class="card"><div class="inner stack">
+          <div class="sectionHead"><div><h2>1. Загрузка базы данных</h2><p>Прямая загрузка SQLite-файлов для пилотного сценария. После загрузки доступен pre-check чувствительных колонок.</p></div><span class="pill">Workflow default</span></div>
+          <div class="drop">
+            <div style="font-size:28px;font-weight:800;margin-bottom:8px">Перетащите файл БД или выберите его вручную</div>
+            <div class="mini" style="margin-bottom:14px">После загрузки система определит таблицы, потенциально чувствительные поля и подготовит базу к маскированию.</div>
+            <input id="db_file" type="file" accept=".db,.sqlite,.sqlite3">
+          </div>
+          <div class="buttonRow">
+            <button class="btn-primary" onclick="uploadDatabase()">Загрузить базу</button>
+            <button class="btn-secondary" onclick="analyzeSelectedDatabase()">Анализ покрытия</button>
+          </div>
+          <div class="grid2" style="grid-template-columns:1fr 220px;gap:12px">
+            <div><label for="policy_profile_select">Профиль политики</label><select id="policy_profile_select"></select></div>
+            <div><label for="strict_mode_checkbox">Strict mode</label><div class="sessionState" style="padding:12px 14px"><input id="strict_mode_checkbox" type="checkbox" style="width:auto;margin-right:10px"> fail on unmapped high-risk</div></div>
+          </div>
+          <div id="selected_db_box" class="summaryBox hidden"></div>
+          
+          <div class="subCard">
+            <div class="labelRow">
+              <h4>Исходная база — предпросмотр таблицы</h4>
+              <div class="actionBar" style="max-width:460px">
+                <button class="btn-secondary" onclick="loadSourcePreview()">Обновить исходный предпросмотр</button>
+              </div>
+            </div>
+            <div class="toolbarCompact">
+              <div><label for="source_table_select">Исходная таблица</label><select id="source_table_select"></select></div>
+              <div id="source_preview_meta" class="tableMeta"></div>
+            </div>
+            <div class="tableFrame" id="source_preview_frame"><div class="empty">После загрузки базы здесь будет реальный табличный вид исходных данных.</div></div>
+            <div id="upload_output" class="resultBox hidden">Технический вывод загрузки.</div>
+          </div>
+        </div></section>
+
+        <section class="card"><div class="inner stack rightSticky">
+          <div class="sectionHead"><div><h2>2. Маскирование</h2><p>Будет создана отдельная маскированная копия. Исходный файл остаётся без изменений.</p></div><span class="pill">In-place on copy</span></div>
+          <div><label for="db_mask_mode">Режим маскирования</label>
+            <select id="db_mask_mode">
+              <option value="deterministic">deterministic</option>
+              <option value="randomized">randomized</option>
+            </select>
+          </div>
+          <div class="summaryBox" id="policy_runtime_summary"><div class="mini">Runtime policy: auto-discovery fallback</div></div>
+          <button class="btn-success" onclick="runDatabaseMasking()">Запустить маскирование базы</button>
+          <div id="mask_status" class="sessionState status-warn">Ожидается выбранная база.</div>
+          
+          <div class="subCard">
+            <div class="labelRow">
+              <h4>Операторский просмотр результата</h4>
+              <div class="actionBar" style="max-width:560px">
+                <button class="btn-secondary" onclick="syncCompareTable()">Синхронизировать выбранную таблицу</button>
+                <button class="btn-secondary" onclick="loadMaskedPreview()">Обновить маскированный предпросмотр</button>
+              </div>
+            </div>
+            <div id="mask_kpi_band" class="kpiBand hidden">
+              <div class="kpiMini"><div class="k">Job</div><div id="mask_kpi_job" class="v">—</div></div>
+              <div class="kpiMini"><div class="k">Coverage</div><div id="mask_kpi_coverage" class="v">—</div></div>
+              <div class="kpiMini"><div class="k">Changed columns</div><div id="mask_kpi_changed" class="v">—</div></div>
+              <div class="kpiMini"><div class="k">High-risk unmasked</div><div id="mask_kpi_unmasked" class="v">—</div></div>
+            </div>
+            <div class="compareGrid">
+              <div>
+                <div class="toolbarCompact">
+                  <div><label for="compare_source_table_select">Исходная таблица</label><select id="compare_source_table_select"></select></div>
+                  <div id="compare_source_meta" class="tableMeta"></div>
+                </div>
+                <div class="tableFrame" id="compare_source_frame"><div class="empty">После загрузки базы здесь будет выбранная исходная таблица.</div></div>
+              </div>
+              <div>
+                <div class="toolbarCompact">
+                  <div><label for="masked_table_select">Маскированная таблица</label><select id="masked_table_select"></select></div>
+                  <div id="masked_preview_meta" class="tableMeta"></div>
+                </div>
+                <div class="tableFrame" id="masked_preview_frame"><div class="empty">После маскирования здесь будет выбранная маскированная таблица.</div></div>
+              </div>
+            </div>
+            <div id="mask_output" class="resultBox hidden">Технический вывод маскирования.</div>
+          </div>
+          <div id="result_summary" class="summaryBox hidden"></div>
+        </div></section>
+      </div>
+
+      <div class="grid2">
+        <section class="card"><div class="inner stack">
+          <div class="sectionHead"><div><h2>3. Audit & Coverage Report</h2><p>До запуска — список найденных полей. После запуска — покрытие маскирования, пропуски и экспорт отчётов.</p></div><span class="pill">Coverage</span></div>
+          <div id="coverage_status" class="sessionState status-warn">Ожидается анализ загруженной базы.</div>
+          <div id="coverage_summary" class="summaryBox hidden"></div>
+          <div class="analysisWrap hidden" id="analysis_table_wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Таблица</th>
+                  <th>Колонка</th>
+                  <th>Masker</th>
+                  <th>Риск</th>
+                  <th>Строк</th>
+                </tr>
+              </thead>
+              <tbody id="analysis_table_body">
+                <tr><td colspan="5" class="mini">После анализа здесь появится список найденных полей.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="actionBar"><button class="btn-secondary" onclick="analyzeSelectedDatabase()">Обновить анализ</button><button class="btn-secondary" onclick="loadCoverageReport()">Загрузить report по job</button></div><div id="coverage_output" class="resultBox">Здесь будет отчёт покрытия: найдено / замаскировано / что пропущено.</div>
+        </div></section>
+
+        <section class="card"><div class="inner stack">
+          <div class="sectionHead"><div><h2>4. Очередь, аудит и реестр загрузок</h2><p>Служебные операции: jobs, queue, audit chain и повторный выбор ранее загруженных баз.</p></div></div>
+          <div class="buttonRow">
+            <button class="btn-secondary" onclick="listJobs()">List jobs</button>
+            <button class="btn-secondary" onclick="queueStats()">Queue stats</button>
+            <button class="btn-secondary" onclick="verifyAudit()">Verify audit</button>
+          </div>
+          <div id="jobs_output" class="resultBox">Служебный вывод jobs / queue / audit будет здесь.</div>
+          <div class="listWrap">
+            <table>
+              <thead>
+                <tr><th>Файл</th><th>Путь</th><th>Действие</th></tr>
+              </thead>
+              <tbody id="db_list">
+                <tr><td colspan="3" class="mini">Загруженных баз пока нет.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div></section>
+      </div>
+
+      </main>
+  </section>
+</div>
+
+<script>
+  let token = localStorage.getItem('ds_token') || '';
+  let selectedUpload = null;
+  let dbCache = [];
+  let lastCoverageReport = null;
+  let lastMaskResult = null;
+  let sourcePreviewData = null;
+  let maskedPreviewData = null;
+  let policyProfiles = [];
+
+  const $ = (id) => document.getElementById(id);
+  const show = (id) => { const el = $(id); if (el) el.classList.remove('hidden'); };
+  const hide = (id) => { const el = $(id); if (el) el.classList.add('hidden'); };
+  const safeText = (id, value) => { const el = $(id); if (el) el.textContent = String(value); };
+  const safeHTML = (id, value) => { const el = $(id); if (el) el.innerHTML = value; };
+  const scrollToId = (id) => { const el = $(id); if (el) el.scrollIntoView({behavior:'smooth', block:'center'}); };
+
+  function fileNameFromUrl(url, fallback='download.bin'){
+    try{ const p = url.split('/').pop(); return p || fallback; } catch { return fallback; }
+  }
+  function authHeaders(extra = {}) {
+    const h = {...extra};
+    if (token) h['Authorization'] = 'Bearer ' + token;
+    return h;
+  }
+
+  function selectedPolicyProfile() {
+    const el = $('policy_profile_select');
+    return el && el.value ? el.value : '';
+  }
+  function strictModeEnabled() {
+    return !!($('strict_mode_checkbox') && $('strict_mode_checkbox').checked);
+  }
+  function updatePolicyRuntimeSummary(profileMeta = null, strictMode = false) {
+    const el = $('policy_runtime_summary');
+    if (!el) return;
+    if (profileMeta) {
+      el.innerHTML = `<div class="summaryGrid">
+        <b>Policy</b><div>${profileMeta.policy_name || profileMeta.name || '—'}</div>
+        <b>Version</b><div>${profileMeta.policy_version || '—'}</div>
+        <b>Country</b><div>${profileMeta.country || 'BY'}</div>
+        <b>Mode</b><div>${profileMeta.mode || 'explicit_profile_first'}</div>
+        <b>Strict mode</b><div>${strictMode ? 'enabled' : 'disabled'}</div>
+      </div>`;
+    } else {
+      el.innerHTML = `<div class="mini">Runtime policy: auto-discovery fallback. Strict mode: ${strictMode ? 'enabled' : 'disabled'}.</div>`;
+    }
+  }
+  async function loadPolicyProfiles() {
+    const select = $('policy_profile_select');
+    if (!select || !token) return;
+    try {
+      const data = await api('/api/policy-profiles');
+      policyProfiles = data.profiles || [];
+      select.innerHTML = '<option value="">auto-discovery fallback</option>' + policyProfiles.map(p => `<option value="${p.name}">${p.policy_name || p.name} · ${p.policy_version || 'unknown'}</option>`).join('');
+    } catch (e) {
+      select.innerHTML = '<option value="">auto-discovery fallback</option>';
+    }
+  }
+  function setOutput(id, data) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  }
+  function setSession(text, isOk = true) {
+    const el = $('session_state');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('status-ok', 'status-warn', 'status-bad');
+    el.classList.add(isOk ? 'status-ok' : 'status-bad');
+  }
+
+  function setAuthState(text, state='warn') {
+    const el = $('auth_status');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('status-ok','status-warn','status-bad');
+    if (state === 'ok') el.classList.add('status-ok');
+    else if (state === 'bad') el.classList.add('status-bad');
+    else el.classList.add('status-warn');
+  }
+
+  function setLoginBusy(isBusy) {
+    const btn = $('login_btn');
+    const resetBtn = $('login_reset_btn');
+    const form = $('login_form');
+    if (btn) {
+      btn.disabled = isBusy;
+      btn.textContent = isBusy ? 'Выполняется вход...' : 'Войти в консоль';
+    }
+    if (resetBtn) resetBtn.disabled = isBusy;
+    if (form) {
+      if (isBusy) form.classList.add('authBusy');
+      else form.classList.remove('authBusy');
+    }
+  }
+
+  function resetLoginForm() {
+    if ($('login_user')) $('login_user').value = 'admin';
+    if ($('login_pass')) $('login_pass').value = '';
+    hide('auth_output');
+    setAuthState('Ожидается вход.', 'warn');
+  }
+  function setStatusState(id, text, state='ok') {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('status-ok','status-warn','status-bad');
+    if (state === 'ok') el.classList.add('status-ok');
+    else if (state === 'warn') el.classList.add('status-warn');
+    else el.classList.add('status-bad');
+  }
+  async function api(path, opts = {}) {
+    const init = { method: opts.method || 'GET', headers: authHeaders(opts.headers || {}) };
+    if (opts.body !== undefined) {
+      init.headers['Content-Type'] = 'application/json';
+      init.body = JSON.stringify(opts.body);
+    }
+    if (opts.formData) {
+      delete init.headers['Content-Type'];
+      init.body = opts.formData;
+    }
+    const res = await fetch(path, init);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = text; }
+    if (!res.ok) throw new Error(typeof data === 'string' ? data : JSON.stringify(data));
+    return data;
+  }
+  async function downloadWithAuth(url, filename) {
+    const res = await fetch(url, { headers: authHeaders() });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text);
+    }
+    const blob = await res.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  async function login() {
+    const username = $('login_user')?.value?.trim() || '';
+    const password = $('login_pass')?.value?.trim() || '';
+    if (!username || !password) {
+      show('auth_output');
+      setOutput('auth_output', 'Укажите логин и пароль.');
+      setAuthState('Не заполнены логин или пароль.', 'bad');
+      return;
+    }
+    setLoginBusy(true);
+    setAuthState('Выполняется вход...', 'warn');
+    try {
+      const data = await api('/api/auth/login', {method:'POST', body:{username, password}});
+      token = data.token || '';
+      localStorage.setItem('ds_token', token);
+      hide('auth_output');
+      setSession(`Авторизован: ${data.username} (${data.role})`, true);
+      setAuthState(`Успешный вход: ${data.username} (${data.role})`, 'ok');
+      await refreshDashboard();
+    } catch (e) {
+      show('auth_output');
+      setOutput('auth_output', String(e));
+      setSession('Ошибка авторизации', false);
+      setAuthState('Вход не выполнен. Проверьте логин/пароль или backend.', 'bad');
+    } finally {
+      setLoginBusy(false);
+    }
+  }
+  async function whoAmI() {
+    try {
+      const data = await api('/api/auth/me');
+      hide('auth_output');
+      setSession(`Авторизован: ${data.username} (${data.role})`, true);
+      setAuthState(`Сессия активна: ${data.username} (${data.role})`, 'ok');
+    } catch (e) {
+      show('auth_output');
+      setOutput('auth_output', String(e));
+      setSession('Не авторизован', false);
+      setAuthState('Сессия не активна.', 'bad');
+    }
+  }
+  async function logout() {
+    try { await api('/api/auth/logout', {method:'POST'}); } catch {}
+    token = '';
+    localStorage.removeItem('ds_token');
+    setSession('Не авторизован', false);
+    setAuthState('Выход выполнен.', 'warn');
+    hide('auth_output');
+  }
+  async function maskPreview() {
+    try {
+      const data = await api('/api/mask', {method:'POST', body:{service:$('svc')?.value || '', value:$('val')?.value || '', mode:$('preview_mode')?.value || 'deterministic'}});
+      setOutput('preview_output', data);
+    } catch (e) { setOutput('preview_output', String(e)); }
+  }
+
+
+  function applyTableMeta(metaId, table){
+    const meta = $(metaId);
+    if (!meta) return;
+    if (!table) {
+      meta.innerHTML = '';
+      return;
+    }
+    meta.innerHTML = `
+      <span class="pill">Столбцов: ${table.columns.length}</span>
+      <span class="pill">Показано строк: ${table.preview_rows}</span>
+      <span class="pill">Всего строк: ${table.total_rows}</span>
+    `;
+  }
+
+  function renderTableToFrame(frameId, table){
+    const frame = $(frameId);
+    if (!frame) return;
+    if (!table) {
+      frame.innerHTML = '<div class="empty">Таблица не найдена.</div>';
+      return;
+    }
+    const head = `<tr>${table.columns.map(c => `<th>${c}</th>`).join('')}</tr>`;
+    const rows = table.rows.length
+      ? table.rows.map(r => `<tr>${table.columns.map(c => `<td title="${String(r[c] ?? '').replace(/"/g, '&quot;')}">${r[c] ?? ''}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${table.columns.length || 1}" class="mini">Нет строк для отображения.</td></tr>`;
+    frame.innerHTML = `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function bindSelectOnce(id, handler){
+    const el = $(id);
+    if (!el || el.dataset.bound) return;
+    el.addEventListener('change', handler);
+    el.dataset.bound = '1';
+  }
+
+  function syncCompareTable(){
+    const srcSel = $('source_table_select');
+    const cmpSel = $('compare_source_table_select');
+    if (srcSel && cmpSel) {
+      cmpSel.value = srcSel.value;
+      renderCompareSourceTable(cmpSel.value);
+    }
+  }
+
+  function renderCompareSourceTable(tableName){
+    const payload = sourcePreviewData;
+    const table = (payload?.tables || []).find(t => t.name === tableName);
+    renderTableToFrame('compare_source_frame', table);
+    applyTableMeta('compare_source_meta', table);
+  }
+  function renderSelectedUpload(data) {
+    show('selected_db_box');
+    safeHTML('selected_db_box', `
+      <div class="summaryGrid">
+        <b>Выбранная база</b><div>${data.saved_name || data.name || ''}</div>
+        <b>Путь</b><div class="mono">${data.saved_path || data.path || ''}</div>
+        <b>Таблиц</b><div>${data.table_count ?? '?'}</div>
+        <b>Оценка строк</b><div>${data.detected_rows ?? data.row_count ?? '?'}</div>
+        <b>Upload ID</b><div class="mono">${data.upload_id || ''}</div>
+      </div>
+    `);
+  }
+
+  function renderDetectedColumnsTable(items){
+    const wrap = $('analysis_table_wrap');
+    const body = $('analysis_table_body');
+    if (!wrap || !body) return;
+    show('analysis_table_wrap');
+    if (!items || !items.length) {
+      body.innerHTML = '<tr><td colspan="5" class="mini">Потенциально чувствительные поля не найдены.</td></tr>';
+      return;
+    }
+    body.innerHTML = items.map(x => `
+      <tr>
+        <td>${x.table ?? ''}</td>
+        <td>${x.column ?? ''}</td>
+        <td>${x.service ?? ''}</td>
+        <td>${x.risk ?? ''}</td>
+        <td>${x.row_count ?? ''}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderDbPreview(kind, payload){
+    const selectId = kind === 'source' ? 'source_table_select' : 'masked_table_select';
+    const frameId = kind === 'source' ? 'source_preview_frame' : 'masked_preview_frame';
+    const metaId = kind === 'source' ? 'source_preview_meta' : 'masked_preview_meta';
+    const select = $(selectId);
+    if (!select) return;
+    const tables = payload?.tables || [];
+    if (!tables.length) {
+      renderTableToFrame(frameId, null);
+      applyTableMeta(metaId, null);
+      select.innerHTML = '';
+      return;
+    }
+    const previous = select.value;
+    select.innerHTML = tables.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+    if (previous && tables.some(t => t.name === previous)) select.value = previous;
+    const current = select.value || tables[0].name;
+    if (kind === 'source') {
+      const compare = $('compare_source_table_select');
+      if (compare) {
+        compare.innerHTML = select.innerHTML;
+        compare.value = current;
+      }
+      const table = tables.find(t => t.name === current);
+      renderTableToFrame(frameId, table);
+      applyTableMeta(metaId, table);
+      renderCompareSourceTable(current);
+      bindSelectOnce('source_table_select', () => {
+        const name = $('source_table_select').value;
+        const t = (sourcePreviewData?.tables || []).find(x => x.name === name);
+        renderTableToFrame('source_preview_frame', t);
+        applyTableMeta('source_preview_meta', t);
+        const compare = $('compare_source_table_select');
+        if (compare) {
+          compare.value = name;
+          renderCompareSourceTable(name);
+        }
+      });
+      bindSelectOnce('compare_source_table_select', () => renderCompareSourceTable($('compare_source_table_select').value));
+    } else {
+      const table = tables.find(t => t.name === current);
+      renderTableToFrame(frameId, table);
+      applyTableMeta(metaId, table);
+      bindSelectOnce('masked_table_select', () => {
+        const name = $('masked_table_select').value;
+        const t = (maskedPreviewData?.tables || []).find(x => x.name === name);
+        renderTableToFrame('masked_preview_frame', t);
+        applyTableMeta('masked_preview_meta', t);
+      });
+    }
+  }
+
+  async function loadSourcePreview(){
+    if (!selectedUpload?.upload_id) { setStatusState('mask_status', 'Сначала загрузите или выберите базу.', 'bad'); return; }
+    try {
+      const data = await api('/api/databases/source-preview', {method:'POST', body:{upload_id:selectedUpload.upload_id, limit:20}});
+      sourcePreviewData = data;
+      renderDbPreview('source', data);
+    } catch (e) {
+      setOutput('upload_output', String(e));
+      show('upload_output');
+    }
+  }
+
+  async function loadMaskedPreview(){
+    if (!lastMaskResult?.download_url) { setStatusState('mask_status', 'Сначала выполните маскирование базы.', 'bad'); return; }
+    try {
+      const maskedName = fileNameFromUrl(lastMaskResult.download_url, '');
+      const data = await api('/api/databases/masked-preview', {method:'POST', body:{masked_name:maskedName, limit:20}});
+      maskedPreviewData = data;
+      renderDbPreview('masked', data);
+    } catch (e) {
+      setOutput('mask_output', String(e));
+      show('mask_output');
+    }
+  }
+
+  async function uploadDatabase(){
+
+    const fileInput = $('db_file');
+    if (!fileInput || !fileInput.files.length) { setOutput('upload_output', 'Сначала выберите SQLite-файл.'); return; }
+    const fd = new FormData(); fd.append('file', fileInput.files[0]);
+    try {
+      const data = await api('/api/databases/upload', {method:'POST', formData:fd});
+      selectedUpload = data;
+      renderSelectedUpload(data);
+      setOutput('upload_output', data);
+      setStatusState('mask_status', `База ${data.saved_name} загружена. Рекомендуется сначала выполнить анализ покрытия.`, 'warn');
+      setStatusState('coverage_status', `База загружена. Предварительно найдено полей: ${data.analysis_summary?.detected_columns ?? 0}`, 'warn');
+      safeText('stat_coverage', `${data.analysis_summary?.detected_columns ?? 0} fields`);
+      await loadSourcePreview();
+      await refreshDashboard();
+    } catch (e) {
+      setOutput('upload_output', String(e));
+      show('upload_output');
+      setStatusState('mask_status', 'Загрузка не выполнена.', 'bad');
+    }
+  }
+
+  async function analyzeSelectedDatabase(){
+    if (!selectedUpload) {
+      setOutput('coverage_output', 'Сначала загрузите или выберите базу из реестра.');
+      setStatusState('coverage_status','База для анализа не выбрана.','bad');
+      return;
+    }
+    setStatusState('coverage_status', 'Выполняется анализ покрытия...', 'warn');
+    try {
+      const data = await api('/api/databases/analyze', {method:'POST', body:{upload_id:selectedUpload.upload_id, profile_name:selectedPolicyProfile(), strict_mode:strictModeEnabled()}});
+      lastCoverageReport = data;
+      setOutput('coverage_output', data);
+      renderDetectedColumnsTable(data.detected_columns || []);
+      show('coverage_summary');
+      safeHTML('coverage_summary', `
+        <div class="coverBand">
+          <div class="coverCard"><div class="k">Таблиц</div><div class="v">${data.summary.tables}</div></div>
+          <div class="coverCard"><div class="k">Найдено колонок</div><div class="v">${data.summary.detected_columns}</div></div>
+          <div class="coverCard"><div class="k">High risk</div><div class="v">${data.summary.high_risk_detected}</div></div>
+          <div class="coverCard"><div class="k">Medium risk</div><div class="v">${data.summary.medium_risk_detected}</div></div>
+        </div>
+      `);
+      safeText('stat_coverage', `${data.summary.detected_columns} fields`);
+      updatePolicyRuntimeSummary(data.policy_profile, data.strict_mode);
+      setStatusState('coverage_status', `Анализ завершён. Найдено полей: ${data.summary.detected_columns}`, 'ok');
+      scrollToId('coverage_status');
+    } catch(e){
+      setOutput('coverage_output', String(e));
+      setStatusState('coverage_status','Анализ завершился с ошибкой.','bad');
+    }
+  }
+
+  function renderCoverageReport(report){
+    lastCoverageReport = report;
+    const s = report.summary || {};
+    const v = report.validation || {};
+    const rowCheck = v.row_count_check || {};
+    const pkCheck = v.pk_stability || {};
+    const fkCheck = v.fk_integrity_check || {};
+    const pan = v.pan_validation || {};
+    const iban = v.iban_validation || {};
+    safeText('stat_coverage', `${s.coverage_percent ?? 0}%`);
+    setStatusState('coverage_status', `Покрытие маскирования: ${s.coverage_percent ?? 0}%`, 'ok');
+    setOutput('coverage_output', report);
+    show('coverage_summary');
+    safeHTML('coverage_summary', `
+      <div class="coverBand">
+        <div class="coverCard"><div class="k">Detected</div><div class="v">${s.detected_columns ?? 0}</div></div>
+        <div class="coverCard"><div class="k">Changed</div><div class="v">${s.changed_columns ?? 0}</div></div>
+        <div class="coverCard"><div class="k">Unchanged</div><div class="v">${s.unchanged_columns ?? 0}</div></div>
+        <div class="coverCard"><div class="k">High-risk unmasked</div><div class="v">${s.high_risk_unmasked ?? 0}</div></div>
+      </div>
+      <div class="coverBand" style="margin-top:12px">
+        <div class="coverCard"><div class="k">Row count mismatches</div><div class="v">${(rowCheck.mismatched_tables || []).length}</div></div>
+        <div class="coverCard"><div class="k">PK mismatch tables</div><div class="v">${(pkCheck.mismatched_tables || []).length}</div></div>
+        <div class="coverCard"><div class="k">FK issues</div><div class="v">${fkCheck.issue_count ?? 0}</div></div>
+        <div class="coverCard"><div class="k">Masked invalid PAN</div><div class="v">${pan.masked_invalid ?? 0}</div></div>
+        <div class="coverCard"><div class="k">Masked invalid IBAN</div><div class="v">${iban.masked_invalid ?? 0}</div></div>
+      </div>
+      <div class="resultLinks">
+        <button class="btn-ghost" onclick="downloadWithAuth('${report.download_report_json_url}','coverage_report.json')">скачать JSON report</button>
+        <button class="btn-ghost" onclick="downloadWithAuth('${report.download_report_csv_url}','coverage_report.csv')">скачать CSV report</button>
+      </div>
+    `);
+    renderDetectedColumnsTable((report.findings || []).map(x => ({table:x.table,column:x.column,service:x.service,risk:x.risk,row_count:''})));
+    show('mask_kpi_band');
+    safeText('mask_kpi_coverage', `${s.coverage_percent ?? 0}%`);
+    safeText('mask_kpi_changed', `${s.changed_columns ?? 0}`);
+    safeText('mask_kpi_unmasked', `${s.high_risk_unmasked ?? 0}`);
+    scrollToId('coverage_status');
+  }
+
+  async function runDatabaseMasking(){
+    if (!selectedUpload) { setOutput('mask_output', 'Сначала загрузите или выберите базу из реестра.'); return; }
+    setStatusState('mask_status', 'Маскирование выполняется. Не закрывайте вкладку до получения результата.', 'warn');
+    try {
+      const data = await api('/api/databases/mask', {method:'POST', body:{upload_id:selectedUpload.upload_id, mode:$('db_mask_mode')?.value || 'deterministic', profile_name:selectedPolicyProfile(), strict_mode:strictModeEnabled()}});
+      lastMaskResult = data;
+      hide('mask_output');
+      setStatusState('mask_status', data.saved_message || 'Маскирование завершено.', 'ok');
+      show('result_summary');
+      safeHTML('result_summary', `
+        <div class="summaryGrid">
+          <b>Job ID</b><div class="mono">${data.job_id}</div>
+          <b>Маскированная база</b><div class="mono">${data.masked_db}</div>
+          <b>Конфиг выполнения</b><div class="mono">${data.config_path}</div>
+          <b>Rows total</b><div>${data.rows_total ?? '—'}</div>
+          <b>Tables total</b><div>${data.tables_total ?? '—'}</div>
+          <b>Policy</b><div>${data.policy_profile?.policy_name || 'auto-discovery fallback'}</div>
+          <b>Strict mode</b><div>${data.strict_mode ? 'enabled' : 'disabled'}</div>
+          <b>Скачать</b>
+          <div class="resultLinks">
+            <button class="btn-ghost" onclick="downloadWithAuth('${data.download_url}','${fileNameFromUrl(data.download_url,'masked_database.sqlite')}')">скачать маскированную базу</button>
+          </div>
+        </div>
+      `);
+      safeText('mask_kpi_job', data.job_id || '—');
+      if (data.coverage_report) renderCoverageReport(data.coverage_report);
+      await loadMaskedPreview();
+      await refreshDashboard();
+      scrollToId('result_summary');
+    } catch(e){
+      setOutput('mask_output', String(e));
+      show('mask_output');
+      setStatusState('mask_status', 'Маскирование завершилось с ошибкой.', 'bad');
+    }
+  }
+
+  async function loadCoverageReport(){
+    if (!lastMaskResult?.job_id) { setOutput('coverage_output', 'Сначала выполните маскирование или получите job_id.'); return; }
+    try {
+      const data = await api(`/api/reports/${lastMaskResult.job_id}`);
+      renderCoverageReport(data);
+    } catch(e){ setOutput('coverage_output', String(e)); }
+  }
+
+  async function loadDatabases(){
+    try {
+      const items = await api('/api/databases');
+      dbCache = items;
+      safeText('stat_uploaded', items.length);
+      const tbody = $('db_list');
+      if (!tbody) return;
+      if (!items.length) { tbody.innerHTML='<tr><td colspan="3" class="mini">Загруженных баз пока нет.</td></tr>'; return; }
+      tbody.innerHTML = items.map((item,index)=>`
+        <tr>
+          <td><strong>${item.name}</strong><div class="mini">${Math.round(item.size_bytes/1024)} KB</div></td>
+          <td class="mini mono">${item.path}</td>
+          <td><button class="btn-ghost" style="padding:10px 12px" onclick="selectExistingByIndex(${index})">Выбрать</button></td>
+        </tr>
+      `).join('');
+    } catch(e){ setOutput('jobs_output', String(e)); }
+  }
+  function selectExistingByIndex(index){
+    const item=dbCache[index];
+    if(!item) return;
+    selectedUpload=item;
+    renderSelectedUpload({saved_name:item.name,saved_path:item.path,table_count:'?',detected_rows:'?',upload_id:item.upload_id});
+    setStatusState('mask_status', `Выбрана ранее загруженная база ${item.name}. Можно запускать маскирование.`, 'warn');
+    setStatusState('coverage_status','Для этой базы доступен повторный анализ покрытия.','warn');
+    loadSourcePreview();
+  }
+  async function queueStats(){
+    try {
+      const data = await api('/api/queue/stats');
+      safeText('stat_queued', data.queued ?? 0);
+      safeText('stat_completed', data.completed ?? 0);
+      safeText('stat_failed', data.failed ?? 0);
+      setOutput('jobs_output', data);
+    } catch(e){ setOutput('jobs_output', String(e)); }
+  }
+  async function listJobs(){
+    try {
+      const data = await api('/api/jobs');
+      setOutput('jobs_output', data);
+      safeText('stat_completed', data.filter(x=>x.status==='completed').length);
+      safeText('stat_failed', data.filter(x=>x.status==='failed').length);
+      safeText('stat_queued', data.filter(x=>x.status==='queued').length);
+    } catch(e){ setOutput('jobs_output', String(e)); }
+  }
+  async function verifyAudit(){
+    try { const data = await api('/api/audit/verify'); setOutput('jobs_output', data); }
+    catch(e){ setOutput('jobs_output', String(e)); }
+  }
+  async function refreshDashboard(){ await Promise.allSettled([loadDatabases(), queueStats()]); }
+
+  window.addEventListener('load', async ()=>{
+    if($('login_user')) $('login_user').value='admin';
+    if($('login_pass')) $('login_pass').value='';
+    const form = $('login_form');
+    if (form && !form.dataset.bound) {
+      form.addEventListener('submit', (e) => { e.preventDefault(); login(); });
+      form.dataset.bound = '1';
+    }
+    if ($('login_user') && !($('login_user').dataset.bound)) {
+      $('login_user').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); login(); }});
+      $('login_user').dataset.bound = '1';
+    }
+    if ($('login_pass') && !($('login_pass').dataset.bound)) {
+      $('login_pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); login(); }});
+      $('login_pass').dataset.bound = '1';
+    }
+    setAuthState('Ожидается вход.', 'warn');
+    if(token) { await whoAmI(); await loadPolicyProfiles(); }
+    await refreshDashboard();
+  });
+</script>
+</body>
+</html>
