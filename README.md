@@ -84,31 +84,31 @@
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         DataShield BY                               │
 │                                                                     │
-│  ┌──────────────┐    ┌─────────────────────────────────────────┐   │
-│  │   Web UI     │    │              ETL Pipeline                │   │
-│  │  (Flask SPA) │    │                                         │   │
-│  │              │    │  Source DB ──► FK Graph ──► Topo Sort   │   │
-│  │  Upload DB   │    │      │                        │          │   │
-│  │  Run Job     │    │      └── batch_read ──► Maskers ──►     │   │
-│  │  Download    │    │                           │              │   │
-│  └──────┬───────┘    │                    target_write         │   │
-│         │            │                           │              │   │
-│  ┌──────▼───────┐    │                    AuditLog.jsonl       │   │
-│  │ Control Plane│    └─────────────────────────────────────────┘   │
+│  ┌──────────────┐    ┌─────────────────────────────────────────┐    │
+│  │   Web UI     │    │              ETL Pipeline               │    │
+│  │  (Flask SPA) │    │                                         │    │
+│  │              │    │  Source DB ──► FK Graph ──► Topo Sort   │    │
+│  │  Upload DB   │    │      │                        │         │    │
+│  │  Run Job     │    │      └── batch_read ──► Maskers ──►     │    │
+│  │  Download    │    │                           │             │    │
+│  └──────┬───────┘    │                    target_write         │    │
+│         │            │                           │             │    │
+│  ┌──────▼───────┐    │                    AuditLog.jsonl       │    │
+│  │ Control Plane│    └─────────────────────────────────────────┘    │
 │  │  (SQLite /   │                                                   │
-│  │  PostgreSQL) │    ┌──────────────────────────────────────────┐  │
-│  │              │    │           19 Masking Services             │  │
-│  │  RBAC/Auth   │    │  fio · birthdate · passport · snils      │  │
-│  │  Job Queue   │    │  bankCard · bankAccount · phone · email  │  │
-│  │  Audit Chain │    │  inn · legalDetails · address · ...      │  │
-│  └──────────────┘    └──────────────────────────────────────────┘  │
+│  │  PostgreSQL) │    ┌──────────────────────────────────────────┐   │
+│  │              │    │           19 Masking Services            │   │
+│  │  RBAC/Auth   │    │  fio · birthdate · passport · snils      │   │
+│  │  Job Queue   │    │  bankCard · bankAccount · phone · email  │   │
+│  │  Audit Chain │    │  inn · legalDetails · address · ...      │   │
+│  └──────────────┘    └──────────────────────────────────────────┘   │
 │                                                                     │
-│  ┌──────────────┐    ┌──────────────────────────────────────────┐  │
-│  │   Worker     │    │         Policy Profiles                  │  │
-│  │  (отдельный  │    │  banking_retail_by.yaml                  │  │
-│  │   процесс)   │    │  banking_transactions_by.yaml            │  │
-│  │  Poll + exec │    │  + кастомные профили                     │  │
-│  └──────────────┘    └──────────────────────────────────────────┘  │
+│  ┌──────────────┐    ┌──────────────────────────────────────────┐   │
+│  │   Worker     │    │         Policy Profiles                  │   │
+│  │  (отдельный  │    │  banking_retail_by.yaml                  │   │
+│  │   процесс)   │    │  banking_transactions_by.yaml            │   │
+│  │  Poll + exec │    │  + кастомные профили                     │   │
+│  └──────────────┘    └──────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
